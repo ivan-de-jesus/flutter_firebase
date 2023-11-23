@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart'; // Importa el paquete de autenticación local aquí
 
 void main() {
   runApp(MyApp());
@@ -16,6 +17,33 @@ class MyApp extends StatelessWidget {
 class LoginPage extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  Future<void> _biometrico(BuildContext context) async {
+    final LocalAuthentication _localAuthentication = LocalAuthentication();
+
+    while (true) {
+      try {
+        bool authenticated = await _localAuthentication.authenticate(
+          localizedReason: 'Escanea tu huella para acceder',
+        );
+
+        if (authenticated) {
+          // El usuario se autenticó correctamente
+          // Aquí puedes realizar acciones adicionales después de la autenticación
+          _loginWithBiometrics(
+              context); // Llama a la función _loginWithBiometrics después de la autenticación
+          print('Autenticación exitosa');
+          break; // Sal del bucle si la autenticación es exitosa
+        } else {
+          // El usuario no se autenticó correctamente
+          print('Autenticación fallida');
+        }
+      } catch (e) {
+        // Manejar errores de autenticación aquí
+        print('Error de autenticación: $e');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +71,13 @@ class LoginPage extends StatelessWidget {
               },
               child: Text('Iniciar Sesión'),
             ),
+            TextButton(
+              onPressed: () {
+                _biometrico(
+                    context); // Inicia la autenticación biométrica cuando se presiona el botón
+              },
+              child: Text('Iniciar sesión con huella'),
+            ),
           ],
         ),
       ),
@@ -62,6 +97,12 @@ class LoginPage extends StatelessWidget {
         content: Text('Usuario o contraseña incorrectos'),
       ));
     }
+  }
+
+  void _loginWithBiometrics(BuildContext context) {
+    // Simulación de inicio de sesión exitoso con autenticación biométrica
+    // Redirige directamente a la página de inicio (lista de productos) después del inicio de sesión exitoso
+    Navigator.pushReplacementNamed(context, '/');
   }
 }
 
